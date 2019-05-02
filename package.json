@@ -1,0 +1,92 @@
+{
+  "name": "express-playground",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neilrussell6/express-playground.git"
+  },
+  "bugs": {
+    "url": "https://github.com/neilrussell6/express-playground/issues"
+  },
+  "homepage": "https://github.com/neilrussell6/express-playground#readme",
+  "scripts": {
+    "help": "package-json-help.js",
+    "init": "make init",
+    "lint:js": "eslint --ext .js --ignore-path .gitignore .",
+    "_env:tpl:validate": "make _validate-tpl-envs",
+    "ci:validate": "circleci config validate",
+    "_test:spec": "mocha \"src/**/*.test.js\" --opts mocha.opts",
+    "_test:dot": "npm run _test:spec -- --reporter dot",
+    "test": "npm run _test:spec",
+    "test:watch": "npm run _test:spec -- --watch",
+    "_test:integration:spec": "mocha \"src/**/*.itest.js\" --opts mocha.opts -t 20000",
+    "_test:integration:dot": "npm run _test:integration:spec -- --reporter dot",
+    "test:integration": "npm run _test:integration:spec",
+    "test:integration:watch": "npm run _test:integration:spec -- --watch",
+    "_env:create:local": "make create-env",
+    "_env:create:dev": "make create-env ENV=dev",
+    "_env:create:staging": "make create-env ENV=staging",
+    "_start": "dotenv -e .env node src/index.js",
+    "_start:watch": "dotenv -e .env nodemon src/index.js",
+    "start": "npm-run-all _env:create:local _start",
+    "start:watch": "npm-run-all _env:create:local _start:watch",
+    "_db:start": "make up",
+    "_db:restart": "make up BUILD=true",
+    "_db:stop": "make stop",
+    "db:start": "npm-run-all _env:create:local _db:start",
+    "db:restart": "npm-run-all _env:create:local _db:restart",
+    "db:stop": "make stop",
+    "db:down": "make down",
+    "_db:migrate-status": "dotenv -e .env sequelize db:migrate:status",
+    "_db:migrate": "NODE_ENV=development dotenv -e .env sequelize db:migrate",
+    "_db:migrate:staging": "NODE_ENV=staging dotenv -e .env sequelize db:migrate",
+    "_db:migrate:rollback": "NODE_ENV=development dotenv -e .env sequelize db:migrate:undo",
+    "_db:migrate:rollback:staging": "NODE_ENV=staging dotenv -e .env sequelize db:migrate:undo",
+    "_db:migrate:reset": "NODE_ENV=development dotenv -e .env sequelize db:migrate:undo:all",
+    "_db:migrate:reset:staging": "NODE_ENV=staging dotenv -e .env sequelize db:migrate:undo:all",
+    "db:migrate": "npm-run-all _env:create:local _db:migrate:local",
+    "db:migrate:staging": "npm-run-all _env:create:staging _db:migrate:staging",
+    "db:migrate:rollback": "npm-run-all _env:create:local _db:migrate:rollback:local",
+    "db:migrate:rollback:staging": "npm-run-all _env:create:staging _db:migrate:rollback:staging",
+    "db:migrate:reset": "npm-run-all _env:create:local _db:migrate:reset:local",
+    "db:migrate:reset:staging": "npm-run-all _env:create:staging _db:migrate:reset:staging",
+    "_git:pre-commit": "npm-run-all lint:js _test:all:dot ci:validate",
+    "_git:pre-push": "npm-run-all lint:js test:unit:cov test:cov ci:validate _env:tpl:validate"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run _git:pre-commit",
+      "pre-push": "npm run _git:pre-push"
+    }
+  },
+  "dependencies": {
+    "bluebird": "^3.5.4",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "pg": "^7.10.0",
+    "ramda": "^0.26.0",
+    "sequelize": "^4.41.2",
+    "sequelize-cli": "^5.4.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "dotenv": "^6.1.0",
+    "eslint": "^5.8.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "husky": "^1.1.3",
+    "js-parametrize": "0.0.2",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.18.11",
+    "npm-run-all": "^4.1.3",
+    "package-json-help": "0.0.9",
+    "sinon": "^7.1.1",
+    "umzug": "^2.2.0"
+  }
+}

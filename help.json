@@ -1,0 +1,22 @@
+{
+  "init": "initialize project",
+  "lint:js": "run JS linter",
+  "ci:validate": "validate CircleCI config",
+  "test": "run all unit tests",
+  "test:watch": "run all unit tests, in watch mode",
+  "test:integration": "run all integration tests",
+  "test:integration:watch": "run all integration tests, in watch mode",
+  "start": "start API on 3001",
+  "start:watch": "start API on 3001, in watch mode",
+  "db:start": "start PostgreSQL docker containers",
+  "db:restart": "rebuild and start PostgreSQL docker containers",
+  "db:stop": "stop PostgreSQL docker containers",
+  "db:down": "down PostgreSQL docker containers",
+  "db:migrate-status": "check the status of PostgreSQL migrations locally (using .env)",
+  "db:migrate": "run PostgreSQL migrations locally (using .env)",
+  "db:migrate:staging": "run PostgreSQL migrations on AWS staging (using .env.staging)",
+  "db:migrate:rollback": "rollback previous PostgreSQL migrations locally (using .env)",
+  "db:migrate:rollback:staging": "rollback previous PostgreSQL migrations on AWS staging (using .env.staging)",
+  "db:migrate:reset": "reset all PostgreSQL migrations locally (using .env)",
+  "db:migrate:reset:staging": "reset all PostgreSQL migrations on AWS staging (using .env.dev)"
+}
