@@ -14,12 +14,10 @@ const { QUERY_PARAM_CONFIG, RESPONSE_MAP } = require('./constants')
 const getCustomers = queryParams => Bluebird
   .resolve(queryParams)
   .then(RequestUtils.extractQueryParams(QUERY_PARAM_CONFIG))
-  .tap(x => console.log(x))
-  .tap(x => console.log(R.invertObj(RESPONSE_MAP)))
   .then(config => Bluebird
     .resolve(R.prop(config.sortField, R.invertObj(RESPONSE_MAP)))
     .then(sortField => DbUtils.getCustomers(sortField, config.sortDirection, config.pageSize, config.pageNumber))
-    .delay(1000)
+    // .delay(1000) // delay hack
     // .then(() => ({ rows: [], count: 0 })) // no data hack
     .then(({ rows, count }) => ResponseUtils
       .buildPaginationResponse(API_ENDPOINT_CUSTOMERS, queryParams, QUERY_PARAM_CONFIG, config.pageNumber, config.pageSize, rows, count))
