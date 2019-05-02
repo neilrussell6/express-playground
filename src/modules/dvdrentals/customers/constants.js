@@ -10,7 +10,7 @@ const RESPONSE_MAP = {
   create_date: 'created',
 }
 
-const ORDER_VALUES = ['customer_id', 'email', 'first_name', 'last_name']
+const ORDER_VALUES = ['customer_id', 'email', 'first_name', 'last_name', 'create_date']
 const MAPPED_ORDER_VALUES = R.map(R.prop(R.__, RESPONSE_MAP), ORDER_VALUES)
 const SORT_VALUES = ['ASC', 'DESC']
 
