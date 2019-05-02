@@ -7,10 +7,12 @@ const models = require('../../../../db/models/index')
 // get customers
 //-----------------------------------------
 
-const paginate = (model, sortField, sortDirection, pageSize, pageNumber) => Bluebird
+const paginate = (model, pk, sortField, sortDirection, pageSize, pageNumber) => Bluebird
   .all([
     model.findAll({
-      order: [ [sortField, sortDirection] ],
+      order: sortField === pk
+        ? [[sortField, sortDirection]]
+        : [[sortField, sortDirection], [pk, 'ASC']],
       limit: pageSize,
       offset: (pageNumber - 1) * pageSize,
     }),
@@ -18,7 +20,7 @@ const paginate = (model, sortField, sortDirection, pageSize, pageNumber) => Blue
   ])
   .then(R.zipObj(['rows', 'count']))
 
-const getCustomers = (...args) => paginate(models.Customer, ...args)
+const getCustomers = (...args) => paginate(models.Customer, 'customer_id', ...args)
 
 module.exports.getCustomers = getCustomers
 
