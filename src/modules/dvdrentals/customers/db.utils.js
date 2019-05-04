@@ -1,24 +1,35 @@
 const R = require('ramda')
 const Bluebird = require('bluebird')
+const Sequelize = require('sequelize')
 
 const models = require('../../../../db/models/index')
+
+const Op = Sequelize.Op
 
 //-----------------------------------------
 // get customers
 //-----------------------------------------
 
-const paginate = (model, pk, sortField, sortDirection, pageSize, pageNumber) => Bluebird
-  .all([
-    model.findAll({
-      order: sortField === pk
-        ? [[sortField, sortDirection]]
-        : [[sortField, sortDirection], [pk, 'ASC']],
-      limit: pageSize,
-      offset: (pageNumber - 1) * pageSize,
-    }),
-    model.count(),
-  ])
-  .then(R.zipObj(['rows', 'count']))
+const paginate = (model, pk, filteringFields, sortingFields, pageSize, pageNumber) => {
+  const where = R.reduce((acc, [k, v]) => {
+    return R.mergeRight(acc, { [k]: { [Op.iLike]: `${v}%` } })
+  }, {}, filteringFields)
+  return (
+    Bluebird
+      .all([
+        model.findAll({
+          where,
+          order: R.includes(pk, R.pluck(0, sortingFields))
+                 ? sortingFields
+                 : R.concat(sortingFields, [[pk, 'ASC']]),
+          limit: pageSize,
+          offset: (pageNumber - 1) * pageSize,
+        }),
+        model.count({ where }),
+      ])
+      .then(R.zipObj(['rows', 'count']))
+  )
+}
 
 const getCustomers = (...args) => paginate(models.Customer, 'customer_id', ...args)
 

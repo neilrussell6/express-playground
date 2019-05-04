@@ -16,8 +16,8 @@ const SORT_VALUES = ['ASC', 'DESC']
 
 // TODO: convert to array so we can retain order eg. [ { key: 'sortField', path: ['sort ...
 const QUERY_PARAM_CONFIG = {
-  sortField: { path: ['sort', 'field' ], type: 'enum', options: MAPPED_ORDER_VALUES, defaultValue: 'id' },
-  sortDirection: { path: ['sort', 'direction' ], type: 'enum', options: SORT_VALUES, defaultValue: 'ASC' },
+  // sortField: { path: ['sort', 'field' ], type: 'enum', options: MAPPED_ORDER_VALUES, defaultValue: 'id' },
+  // sortDirection: { path: ['sort', 'direction' ], type: 'enum', options: SORT_VALUES, defaultValue: 'ASC' },
   pageNumber: { path: ['page', 'number' ], type: 'int', defaultValue: 1 },
   pageSize: { path: ['page', 'size' ], type: 'int', defaultValue: 10 },
 }

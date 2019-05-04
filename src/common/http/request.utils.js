@@ -68,3 +68,27 @@ const extractQueryParams = config => data => R.pipe(
 )(config)
 
 module.exports.extractQueryParams = extractQueryParams
+
+//-----------------------------------------
+// extract filter query params
+//-----------------------------------------
+
+const extractFilterParams = fieldMap => R.pipe(
+  R.propOr({}, 'filter'),
+  R.toPairs,
+  R.map(([k, v]) => [R.prop(k, fieldMap), v]),
+)
+
+module.exports.extractFilterParams = extractFilterParams
+
+//-----------------------------------------
+// extract sort query params
+//-----------------------------------------
+
+const extractSortParams = fieldMap => R.pipe(
+  R.propOr({}, 'sort'),
+  R.toPairs,
+  R.map(([k, v]) => [R.prop(k, fieldMap), v]),
+)
+
+module.exports.extractSortParams = extractSortParams

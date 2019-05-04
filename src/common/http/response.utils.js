@@ -63,7 +63,7 @@ const buildPaginationResponsePaginationLinks = (count, pageNumber, pageSize) => 
     prev: pageNumber - 1 < 1 ? self : `page[number]=${pageNumber - 1}`,
     next: pageNumber + 1 >= count ? self : `page[number]=${pageNumber + 1}`,
     first: 'page[number]=1',
-    last: `page[number]=${count / pageSize}`,
+    last: `page[number]=${Math.ceil(count / pageSize)}`,
   }
 }
 

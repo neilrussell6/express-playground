@@ -13,10 +13,13 @@ const { QUERY_PARAM_CONFIG, RESPONSE_MAP } = require('./constants')
 
 const getCustomers = queryParams => Bluebird
   .resolve(queryParams)
-  .then(RequestUtils.extractQueryParams(QUERY_PARAM_CONFIG))
+  .then(x => R.mergeRight({
+    filtering: RequestUtils.extractFilterParams(R.invertObj(RESPONSE_MAP))(x),
+    sorting: RequestUtils.extractSortParams(R.invertObj(RESPONSE_MAP))(x),
+  }, RequestUtils.extractQueryParams(QUERY_PARAM_CONFIG)(x)))
   .then(config => Bluebird
-    .resolve(R.prop(config.sortField, R.invertObj(RESPONSE_MAP)))
-    .then(sortField => DbUtils.getCustomers(sortField, config.sortDirection, config.pageSize, config.pageNumber))
+    .resolve(config)
+    .then((x) => DbUtils.getCustomers(x.filtering, x.sorting, x.pageSize, x.pageNumber))
     // .delay(1000) // delay hack
     // .then(() => ({ rows: [], count: 0 })) // no data hack
     .then(({ rows, count }) => ResponseUtils
