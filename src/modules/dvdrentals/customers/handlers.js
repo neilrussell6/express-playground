@@ -1,11 +1,16 @@
 const R = require('ramda')
 const Bluebird = require('bluebird')
 
-const { API_ENDPOINT_CUSTOMERS } = require('./constants')
 const DbUtils = require('./db.utils')
 const RequestUtils = require('../../../common/http/request.utils')
 const ResponseUtils = require('../../../common/http/response.utils')
-const { QUERY_PARAM_CONFIG, RESPONSE_MAP } = require('./constants')
+const {
+  API_ENDPOINT_CUSTOMERS,
+  QUERY_PARAM_CONFIG,
+  REQUEST_BODY_KEY_MAP,
+  PRIMARY_KEY,
+  BASE_PARAMS,
+} = require('./constants')
 
 //-----------------------------------------
 // get customers
@@ -13,19 +18,16 @@ const { QUERY_PARAM_CONFIG, RESPONSE_MAP } = require('./constants')
 
 const getCustomers = queryParams => Bluebird
   .resolve(queryParams)
-  .then(x => R.mergeRight({
-    filtering: RequestUtils.extractFilterParams(R.invertObj(RESPONSE_MAP))(x),
-    sorting: RequestUtils.extractSortParams(R.invertObj(RESPONSE_MAP))(x),
-  }, RequestUtils.extractQueryParams(QUERY_PARAM_CONFIG)(x)))
-  .then(config => Bluebird
-    .resolve(config)
-    .then((x) => DbUtils.getCustomers(x.filtering, x.sorting, x.pageSize, x.pageNumber))
+  .then(RequestUtils.extractQueryParams(QUERY_PARAM_CONFIG, REQUEST_BODY_KEY_MAP))
+  .then(queryParams => Bluebird
+    .resolve(queryParams)
+    .then(DbUtils.getCustomers(BASE_PARAMS))
     // .delay(1000) // delay hack
     // .then(() => ({ rows: [], count: 0 })) // no data hack
     .then(({ rows, count }) => ResponseUtils
-      .buildPaginationResponse(API_ENDPOINT_CUSTOMERS, queryParams, QUERY_PARAM_CONFIG, config.pageNumber, config.pageSize, rows, count))
+      .buildPaginationResponse(API_ENDPOINT_CUSTOMERS, BASE_PARAMS, queryParams, QUERY_PARAM_CONFIG, rows, count))
     .then(R.evolve({
-      data: R.map(ResponseUtils.transformResponse(RESPONSE_MAP)),
+      data: R.map(ResponseUtils.transformResponse(REQUEST_BODY_KEY_MAP)),
     }))
   )
 
@@ -35,8 +37,30 @@ module.exports.getCustomers = getCustomers
 // create customer
 //-----------------------------------------
 
-const createCustomer = data => DbUtils
-    .createCustomer(data)
-    .then(ResponseUtils.transformResponse(RESPONSE_MAP))
+const createCustomer = data => Bluebird
+  .resolve(data)
+  .then(R.mergeRight({ store: 1, address: 1 }))
+  .then(RequestUtils.transformRequestBody(R.invertObj(REQUEST_BODY_KEY_MAP)))
+  .then(x => DbUtils
+    .createCustomer(x)
+    .then(ResponseUtils.transformResponse(REQUEST_BODY_KEY_MAP))
+  )
 
 module.exports.createCustomer = createCustomer
+
+//-----------------------------------------
+// update customer
+//-----------------------------------------
+
+const updateCustomer = (id, data) => Bluebird
+  .resolve(R.mergeRight({ id }, data))
+  .then(RequestUtils.transformRequestBody(REQUEST_BODY_KEY_MAP))
+  .then(data => Bluebird
+    .resolve(data)
+    .then((data) => DbUtils
+      .updateCustomer(PRIMARY_KEY, parseInt(R.prop(PRIMARY_KEY, data), 10), R.omit(PRIMARY_KEY, data))
+      .then(ResponseUtils.transformResponse(REQUEST_BODY_KEY_MAP))
+    )
+  )
+
+module.exports.updateCustomer = updateCustomer

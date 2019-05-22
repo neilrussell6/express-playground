@@ -31,17 +31,37 @@ module.exports.transformResponse = transformResponse
 //-----------------------------------------
 
 const rebuildExtraQueryParams = queryParams => R.pipe(
-  R.pluck('path'),
-  R.mapObjIndexed((i, k, obj) => [
-    pathToUrlQueryParam(obj[k]),
-    R.pathOr(null, obj[k], queryParams),
-  ]),
-  R.filter(R.pipe(R.last, R.isNil, R.not)),
-  R.omit(['pageNumber']),
-  R.values,
-  R.map(R.join('=')),
+  // ... exclude params not in config
+  R.filter(R.compose(R.not, R.isNil, R.path(R.__, queryParams), R.prop('path'))),
+  // ... build values [a, b, c, d]
+  R.reduce((acc, x) => R.pipe(
+    R.prop('path'),
+    path => R.pipe(
+      R.path(R.__, queryParams),
+      R.ifElse(
+        R.is(Object),
+        R.compose(R.toPairs, R.pick(R.prop('keys', x))),
+        x => [[x]],
+      ),
+      R.map(R.concat(path)),
+      R.concat(acc),
+    )(path),
+  )(x), []),
+  // ... exclude nulls
+  R.filter(R.compose(R.not, R.isNil, R.last)),
+  // ... build string a[b][c]=d
+  R.map(R.pipe(
+    path => R.pipe(
+      R.compose(R.join(']['), R.slice(1, -1)),
+      R.ifElse(
+        R.isEmpty,
+        () => `${R.head(path)}=${R.last(path)}`,
+        x => `${R.head(path)}[${x}]=${R.last(path)}`,
+      ),
+    )(path),
+  )),
+  // ... join with &
   R.join('&'),
-  R.ifElse(R.isEmpty, R.always(''), x => `&${x}`),
 )
 module.exports.rebuildExtraQueryParams = rebuildExtraQueryParams
 
@@ -54,6 +74,7 @@ const buildPaginationResponsePaginationMeta = (count, pageNumber, pageSize) => (
   totalRows: count,
   currentPage: pageNumber,
   totalPages: Math.ceil(count / pageSize),
+  pageSize,
 })
 
 const buildPaginationResponsePaginationLinks = (count, pageNumber, pageSize) => {
@@ -67,12 +88,20 @@ const buildPaginationResponsePaginationLinks = (count, pageNumber, pageSize) => 
   }
 }
 
-const buildPaginationResponse = (endpoint, queryParams, queryParamsConfig, pageNumber, pageSize, rows, count) => {
-  const extraQueryParams = rebuildExtraQueryParams(queryParams)(queryParamsConfig)
+const buildPaginationResponse = (endpoint, baseParams, queryParams, queryParamsConfig, rows, count) => {
+  const params = R.mergeDeepRight(baseParams, queryParams)
+  const { pageNumber, pageSize } = params
+  const _queryParams = R.dissocPath(['page', 'number'])(queryParams)
+  const extraQueryParams = rebuildExtraQueryParams(_queryParams)(queryParamsConfig)
   return ({
     meta: buildPaginationResponsePaginationMeta(count, pageNumber, pageSize),
     links: R.compose(
-      R.map(x => `${endpoint}?${x}${extraQueryParams}`),
+      // TODO: move ifElse to rebuildExtraQueryParams
+      R.map(x => R.ifElse(
+        R.isEmpty,
+        R.always(`${endpoint}?${x}`),
+        y => `${endpoint}?${x}&${y}`,
+      )(extraQueryParams)),
     )(buildPaginationResponsePaginationLinks(count, pageNumber, pageSize)),
     data: rows,
   })

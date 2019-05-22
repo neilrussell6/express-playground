@@ -8,6 +8,8 @@
   "test:integration:watch": "run all integration tests, in watch mode",
   "start": "start API on 3001",
   "start:watch": "start API on 3001, in watch mode",
+  "start:test": "start API on 3001, using test env (for integration and e2e tests)",
+  "start:test:watch": "start API on 3001, in watch mode, using test env (for integration and e2e tests)",
   "db:start": "start PostgreSQL docker containers",
   "db:restart": "rebuild and start PostgreSQL docker containers",
   "db:stop": "stop PostgreSQL docker containers",

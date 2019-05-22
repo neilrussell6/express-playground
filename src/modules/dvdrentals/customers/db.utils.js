@@ -1,37 +1,14 @@
-const R = require('ramda')
 const Bluebird = require('bluebird')
-const Sequelize = require('sequelize')
 
+const PaginateUtils = require('../../../common/db/paginate.utils')
 const models = require('../../../../db/models/index')
-
-const Op = Sequelize.Op
 
 //-----------------------------------------
 // get customers
 //-----------------------------------------
 
-const paginate = (model, pk, filteringFields, sortingFields, pageSize, pageNumber) => {
-  const where = R.reduce((acc, [k, v]) => {
-    return R.mergeRight(acc, { [k]: { [Op.iLike]: `${v}%` } })
-  }, {}, filteringFields)
-  return (
-    Bluebird
-      .all([
-        model.findAll({
-          where,
-          order: R.includes(pk, R.pluck(0, sortingFields))
-                 ? sortingFields
-                 : R.concat(sortingFields, [[pk, 'ASC']]),
-          limit: pageSize,
-          offset: (pageNumber - 1) * pageSize,
-        }),
-        model.count({ where }),
-      ])
-      .then(R.zipObj(['rows', 'count']))
-  )
-}
-
-const getCustomers = (...args) => paginate(models.Customer, 'customer_id', ...args)
+const getCustomers = baseParams => config => PaginateUtils
+  .paginate(models.Customer, 'customer_id', baseParams, config)
 
 module.exports.getCustomers = getCustomers
 
@@ -43,3 +20,14 @@ const createCustomer = data => Bluebird
     .resolve(models.Customer.create(data))
 
 module.exports.createCustomer = createCustomer
+
+//-----------------------------------------
+// update customer
+//-----------------------------------------
+
+const updateCustomer = (pk, pkValue, data) => Bluebird
+  .resolve(data)
+  .then((where) => models.Customer.update(data, { where }))
+  .then(([ id ]) => models.Customer.find({ where: { id } }))
+
+module.exports.updateCustomer = updateCustomer

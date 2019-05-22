@@ -1,5 +1,6 @@
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
+const R = require('ramda')
 
 const models = require('../../../../db/models/index')
 const SUT = require('./db.utils')
@@ -7,63 +8,41 @@ const SUT = require('./db.utils')
 chai.use(chaiAsPromised)
 
 const { assert } = chai
+const Factories = require('./factories')
 
-// --------------------------
-// fixtures
-// --------------------------
-
-const country = {
-  country: 'COUNTRY NAME',
-}
-const city = {
-  city: 'CITY NAME',
-}
-const address = {
-  address: 'ADDRESS LINE 1',
-  address2: 'ADDRESS LINE 2',
-  district: 'ADDRESS DISTRICT',
-  postal_code: 'ADDRESS POSTAL CODE',
-  phone: 'ADDRESS PHONE',
-}
-const staff = {
-  first_name: 'STAFF FIRST NAME',
-  last_name: 'STAFF LAST NAME',
-  email: 'STAFF EMAIL',
-  active: true,
-  username: 'STAFF USERNAME',
-  password: 'STAFF PASSWORD',
-}
-const store = {
-  manager_staff_id: 1,
-}
-const customer = {
-  first_name: 'CUSTOMER FIRST NAME',
-  last_name: 'CUSTOMER LAST NAME',
-  email: 'CUSTOMER EMAIL',
-  activebool: true,
-  active: 1,
-}
-
-describe('customers : db.utils', () => {
+describe('dvdrentals/customers/db.utils', () => {
   beforeEach(async () => {
-    await models.sequelize.sync({ force: true, match: /_test$/, logging: false })
+    await models.sequelize.sync({ force: true, match: /_test$/ })
   })
 
   describe('createCustomer', () => {
     it('should create customer as expected', async () => {
-      // given ... a manager and store exist
-      const _country = await models.Country.create(country)
-      const _city = await models.City.create({ ...city, country_id: _country.country_id })
-      const _address = await models.Address.create({ ...address, city_id: _city.city_id })
-      const _store = await models.Store.create({ ...store, address_id: _address.address_id })
-      // const staff = await models.Staff.create({ ...staff, address_id: address.id, store_id: store.id })
-      // const customer = await models.Store.create({ ...customer, store_id: store.id, address_id: address.id })
+      // given ... a store with address exist
+      const store = await Factories.Store.create()
+      const store_id = store.store_id
+      const address_id = store.address_id
 
       // when ... we create a customer
-      const result = await SUT.createCustomer({ ...customer, store_id: _store.store_id, address_id: _address.address_id })
+      const customer = await Factories.Customer.build()
+      const result = await SUT.createCustomer({ ...customer, store_id, address_id })
 
       // then ... should succeed and return new customer
       assert.equal(result.customer_id, 1)
+    })
+  })
+
+  describe('getCustomers', () => {
+    it('should return all customers as expected', async () => {
+      // given ... 3 customers exist
+      const customers = await Factories.Customer.create(3)
+      const existing_customer_ids = R.pluck('customer_id')(customers)
+
+      // when ... we get all customers
+      const result = await SUT.getCustomers()
+
+      // then ... should return row count and all requested rows
+      assert.equal(result.count, 3)
+      assert.deepEqual(R.pluck('customer_id')(result.rows), existing_customer_ids)
     })
   })
 

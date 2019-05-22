@@ -1,5 +1,17 @@
 const R = require('ramda')
 
+const ENUM_KEYS_VALUES = 'enum-keys-values'
+const ENUM_KEYS = 'enum-keys'
+const INT = 'int'
+
+const queryParamTypes = {
+  ENUM_KEYS_VALUES,
+  ENUM_KEYS,
+  INT,
+}
+
+module.exports.queryParamTypes = queryParamTypes
+
 //-----------------------------------------
 // convert path to query param
 //-----------------------------------------
@@ -15,80 +27,108 @@ const pathToUrlQueryParam = (path) => (
 module.exports.pathToUrlQueryParam = pathToUrlQueryParam
 
 //-----------------------------------------
+// extract query param
+//-----------------------------------------
+
+const extractQueryParamEnumKeysValues = ({ keys, values }) => R.pipe(
+  R.toPairs,
+  R.filter(([k, v]) => R.includes(k, keys) && R.includes(v, values)),
+  R.fromPairs,
+)
+
+const extractQueryParamEnumKeys = ({ keys }) => R.pipe(
+  R.toPairs,
+  R.filter(([k]) => R.includes(k, keys)),
+  R.fromPairs,
+)
+
+const extractQueryParamInt = () => x => parseInt(x, 10)
+
+const extractQueryParamByType = type => R.pipe(
+  // configure transformer functions for each type
+  R.applySpec({
+    [ENUM_KEYS_VALUES]: extractQueryParamEnumKeysValues,
+    [ENUM_KEYS]: extractQueryParamEnumKeys,
+    [INT]: extractQueryParamInt,
+  }),
+  // return transformer function for requested type
+  fs => fs[type],
+)
+
+//-----------------------------------------
+// transform query param
+//-----------------------------------------
+
+const transformQueryParamEnumKeyMapKeysValues = keyMap => ([x, y]) => (
+  [R.propOr(x, x, keyMap), R.propOr(y, y, keyMap)]
+)
+
+const transformQueryParamEnumKeyMapKeys = keyMap => ([x, y]) => (
+  [R.prop(x, keyMap), y]
+)
+
+const transformQueryParamEnumKeyMappers = {
+  [ENUM_KEYS_VALUES]: transformQueryParamEnumKeyMapKeysValues,
+  [ENUM_KEYS]: transformQueryParamEnumKeyMapKeys,
+}
+
+const transformQueryParamEnum = type => ({ key, baseValue, keyMap }) => R.pipe(
+  R.objOf(key),
+  R.mergeDeepRight(R.objOf(key, baseValue)),
+  R.map(R.toPairs),
+  R.ifElse(
+    R.always(R.isNil(keyMap)),
+    R.identity,
+    R.map(R.map(transformQueryParamEnumKeyMappers[type](keyMap))),
+  ),
+)
+
+const transformQueryParamInt = ({ key }) => R.ifElse(
+  x => Number.isNaN(x),
+  R.always({}),
+  R.objOf(key),
+)
+
+const transformQueryParamByType = type => R.pipe(
+  // configure transformer functions for each type
+  R.applySpec({
+    [ENUM_KEYS_VALUES]: transformQueryParamEnum(ENUM_KEYS_VALUES),
+    [ENUM_KEYS]: transformQueryParamEnum(ENUM_KEYS),
+    [INT]: transformQueryParamInt,
+  }),
+  // return transformer function for requested type
+  fs => fs[type],
+)
+
+//-----------------------------------------
 // extract query params
 //-----------------------------------------
 
-const _extractEnumQueryParam = (paramKey, { defaultValue, path, options }) => R.pipe(
-  R.pathOr(null, path),
-  R.ifElse(R.isNil, R.always(defaultValue),
-    R.ifElse(R.includes(R.__, options), R.identity,
-      x => { throw new Error(`invalid value ${x} for ${pathToUrlQueryParam(path)}`) }
-    )
-  ),
+const extractQueryParams = (configs, keyMap) => data => (
+  R.reduce((acc, { key, type, path, baseValue = {}, ...config }) => (
+    R.pipe(
+      R.path(path),
+      extractQueryParamByType(type)(config),
+      transformQueryParamByType(type)({ key, baseValue, keyMap }),
+      R.mergeDeepRight(acc),
+    )(data)
+  ))({})(configs)
 )
-const extractEnumQueryParam = R.uncurryN(2, _extractEnumQueryParam)
-
-const _extractIntQueryParam = (paramKey, { defaultValue, path }) => R.pipe(
-  R.pathOr(null, path),
-  R.ifElse(R.isNil, R.always(defaultValue),
-      x => R.pipe(
-        y => parseInt(y),
-        R.ifElse(y => !Number.isNaN(y) && y > 0, R.identity,
-          () => { throw new Error(`invalid value ${x} for ${pathToUrlQueryParam(path)}`) }
-        ),
-      )(x)
-  ),
-)
-const extractIntQueryParam = R.uncurryN(2, _extractIntQueryParam)
-
-const _extractStringQueryParam = (paramKey, { defaultValue, path }) => R.pipe(
-  R.pathOr(null, path),
-  R.ifElse(R.isNil, R.always(defaultValue), R.identity),
-)
-const extractStringQueryParam = R.uncurryN(2, _extractStringQueryParam)
-
-const QUERY_PARAM_TYPE_MAP =  {
-  enum: extractEnumQueryParam,
-  int: extractIntQueryParam,
-  string: extractStringQueryParam,
-}
-
-const getExtractorFnByType = R.pipe(
-  R.prop('type'),
-  R.prop(R.__, QUERY_PARAM_TYPE_MAP),
-)
-
-const extractQueryParams = config => data => R.pipe(
-  R.toPairs,
-  R.reduce((acc, [k, v]) => (
-    R.mergeRight(acc, {
-      [k]: getExtractorFnByType(v)(k, v, data),
-    })
-  ), {})
-)(config)
 
 module.exports.extractQueryParams = extractQueryParams
 
 //-----------------------------------------
-// extract filter query params
+// transform request body
 //-----------------------------------------
 
-const extractFilterParams = fieldMap => R.pipe(
-  R.propOr({}, 'filter'),
+const transformRequestBody = fieldMap => R.pipe(
   R.toPairs,
-  R.map(([k, v]) => [R.prop(k, fieldMap), v]),
+  R.map(([x, y]) => [R.propOr(null, x, fieldMap), y]),
+  R.filter(R.pipe(R.head, R.isNil, R.not)),
+  R.fromPairs,
 )
 
-module.exports.extractFilterParams = extractFilterParams
+module.exports.transformRequestBody = transformRequestBody
 
-//-----------------------------------------
-// extract sort query params
-//-----------------------------------------
 
-const extractSortParams = fieldMap => R.pipe(
-  R.propOr({}, 'sort'),
-  R.toPairs,
-  R.map(([k, v]) => [R.prop(k, fieldMap), v]),
-)
 
-module.exports.extractSortParams = extractSortParams
