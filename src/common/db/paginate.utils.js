@@ -30,7 +30,7 @@ const paginate = (model, pk, baseParams, config) => {
   const query = { where, order, limit, offset }
   return Bluebird
     .all([
-      model.findAll(query),
+      model.findAll(query).then(R.pluck('dataValues')),
       model.count({ where }),
     ])
     .then(R.zipObj(['rows', 'count']))

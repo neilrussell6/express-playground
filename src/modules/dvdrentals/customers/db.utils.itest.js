@@ -4,6 +4,7 @@ const R = require('ramda')
 
 const models = require('../../../../db/models/index')
 const SUT = require('./db.utils')
+const { CUSTOMER_PRIMARY_KEY } = require('./constants')
 
 chai.use(chaiAsPromised)
 
@@ -15,9 +16,41 @@ describe('dvdrentals/customers/db.utils', () => {
     await models.sequelize.sync({ force: true, match: /_test$/ })
   })
 
+  describe('getCustomers', () => {
+    it('should return all customers as expected', async () => {
+      // given ... 3 customers exist
+      const customers = await Factories.Customer.create(3)
+      const existingCustomerIds = R.pluck(CUSTOMER_PRIMARY_KEY)(customers)
+
+      // when ... we get all customers
+      const baseParams = {}
+      const config = {}
+      const result = await SUT.getCustomers(baseParams)(config)
+
+      // then ... should return row count and all requested rows
+      assert.equal(result.count, 3)
+      assert.deepEqual(R.pluck(CUSTOMER_PRIMARY_KEY)(result.rows), existingCustomerIds)
+    })
+  })
+
+  describe('getCustomer', () => {
+    it('should return request customer as expected', async () => {
+      // given ... 3 customers exist
+      const customers = await Factories.Customer.create(3)
+      const existingCustomerIds = R.pluck(CUSTOMER_PRIMARY_KEY)(customers)
+
+      // when ... we get 2nd customer
+      const customer2Id = R.nth(1, existingCustomerIds)
+      const result = await SUT.getCustomer(customer2Id)
+
+      // then ... should return requested customer
+      assert.equal(R.prop(CUSTOMER_PRIMARY_KEY, result), customer2Id)
+    })
+  })
+
   describe('createCustomer', () => {
     it('should create customer as expected', async () => {
-      // given ... a store with address exist
+      // given ... a store with address exists
       const store = await Factories.Store.create()
       const store_id = store.store_id
       const address_id = store.address_id
@@ -31,125 +64,55 @@ describe('dvdrentals/customers/db.utils', () => {
     })
   })
 
-  describe('getCustomers', () => {
-    it('should return all customers as expected', async () => {
+  describe('updateCustomer', () => {
+    it('should update customer as expected', async () => {
       // given ... 3 customers exist
-      const customers = await Factories.Customer.create(3)
-      const existing_customer_ids = R.pluck('customer_id')(customers)
+      const customers = await Factories.Customer.create(3, {
+        first_name: 'OLD NAME',
+        activebool: true,
+      })
+      const existingCustomerIds = R.pluck(CUSTOMER_PRIMARY_KEY)(customers)
 
-      // when ... we get all customers
-      const result = await SUT.getCustomers()
+      // when ... we update the 2nd customer
+      const customer2Id = R.nth(1, existingCustomerIds)
+      const result = await SUT.updateCustomer(customer2Id, {
+        first_name: 'NEW NAME',
+        activebool: false,
+      })
 
-      // then ... should return row count and all requested rows
-      assert.equal(result.count, 3)
-      assert.deepEqual(R.pluck('customer_id')(result.rows), existing_customer_ids)
+      // then
+      // ... should update and return 2nd customer as expected
+      assert.equal(result.first_name, 'NEW NAME')
+      assert.equal(result.activebool, false)
+      const customer1 = await SUT.getCustomer(R.nth(0, existingCustomerIds))
+      const customer2 = await SUT.getCustomer(R.nth(1, existingCustomerIds))
+      const customer3 = await SUT.getCustomer(R.nth(2, existingCustomerIds))
+      assert.equal(customer1.first_name, 'OLD NAME')
+      assert.equal(customer2.first_name, 'NEW NAME')
+      assert.equal(customer3.first_name, 'OLD NAME')
     })
   })
 
-  // describe('updateTransaction', () => {
-  //   it('should update transaction as expected', async () => {
-  //     // given ... transaction and user with a wallet exists
-  //     const user = await models.User.create(user1)
-  //     const userId = user.dataValues.id
-  //     const wallet = await models.Wallet.create({ ...wallet1, user_id: userId })
-  //     const walletId = wallet.id
-  //     const transaction = await models.Transaction.create({ ...transaction1, wallet_id: walletId })
-  //     const transactionId = transaction.id
-  //
-  //     // when ... we update the transaction
-  //     const result = await SUT.updateTransaction(transactionId, {
-  //       blockchain_transaction_id: 'BLOCKCHAIN TX ID',
-  //       status: TRANSACTION_STATUS_COMPLETED,
-  //       error_name: 'ERROR NAME',
-  //       error_message: 'ERROR MESSAGE',
-  //     })
-  //
-  //     // then ... should succeed and return updated transaction
-  //     assert.equal(result.id, 1)
-  //     assert.equal(result.wallet_id, walletId)
-  //     assert.equal(result.blockchain_transaction_id, 'BLOCKCHAIN TX ID')
-  //     assert.equal(result.status, TRANSACTION_STATUS_COMPLETED)
-  //     assert.equal(result.error_name, 'ERROR NAME')
-  //     assert.equal(result.error_message, 'ERROR MESSAGE')
-  //   })
-  //
-  //   it('should throw DoesNotExistError if transaction does not exist', async () => {
-  //     // given ... user with a wallet exists but not transaction 1234567890
-  //     const user = await models.User.create(user1)
-  //     const userId = user.dataValues.id
-  //     await models.Wallet.create({ ...wallet1, user_id: userId })
-  //
-  //     // when ... we attempt to update a non-existant transaction
-  //     // then ... should throw DoesNotExistError as expected
-  //     await assert.isRejected(
-  //         SUT.updateTransaction(1234567890, {}),
-  //         DoesNotExistError,
-  //         ERROR_MESSAGE_TRANSACTION_NOT_FOUND,
-  //     )
-  //   })
-  // })
-  //
-  // describe('getTransaction', () => {
-  //   it('should get transaction as expected', async () => {
-  //     // given ... transaction and user with a wallet exists
-  //     const user = await models.User.create(user1)
-  //     const userId = user.dataValues.id
-  //     const wallet = await models.Wallet.create({ ...wallet1, user_id: userId })
-  //     const walletId = wallet.id
-  //     const transaction = await models.Transaction.create({ ...transaction1, wallet_id: walletId })
-  //     const transactionId = transaction.id
-  //
-  //     // when ... we get the transaction
-  //     const result = await SUT.getTransaction(transactionId)
-  //
-  //     // then ... should succeed and return requested transaction
-  //     assert.equal(result.id, 1)
-  //     assert.equal(result.wallet_id, walletId)
-  //   })
-  //
-  //   it('should throw DoesNotExistError if transaction does not exist', async () => {
-  //     // given ... user with a wallet exists but not transaction 1234567890
-  //     const user = await models.User.create(user1)
-  //     const userId = user.dataValues.id
-  //     await models.Wallet.create({ ...wallet1, user_id: userId })
-  //
-  //     // when ... we attempt to update a non-existant transaction
-  //     // then ... should throw DoesNotExistError as expected
-  //     await assert.isRejected(
-  //         SUT.getTransaction(1234567890),
-  //         DoesNotExistError,
-  //         ERROR_MESSAGE_TRANSACTION_NOT_FOUND,
-  //     )
-  //   })
-  // })
-  //
-  // describe('getTransactionByRef', () => {
-  //   it('should get transaction by reference as expected', async () => {
-  //     // given ... transaction and user with a wallet exists
-  //     const user = await models.User.create(user1)
-  //     const userId = user.dataValues.id
-  //     const wallet = await models.Wallet.create({ ...wallet1, user_id: userId })
-  //     const walletId = wallet.id
-  //     const transaction = await models.Transaction.create({ ...transaction1, ref: '123', wallet_id: walletId })
-  //     const transactionRef = transaction.ref
-  //
-  //     // when ... we get the transaction by reference
-  //     const result = await SUT.getTransactionByRef(transactionRef)
-  //
-  //     // then ... should succeed and return requested transaction
-  //     assert.equal(result.id, 1)
-  //     assert.equal(result.wallet_id, walletId)
-  //   })
-  //
-  //   it('should throw DoesNotExistError if transaction does not exist', async () => {
-  //     // given ... there are no transactions
-  //     // when ... we get the transaction by ref
-  //     // then ... should throw DoesNotExistError as expected
-  //     await assert.isRejected(
-  //         SUT.getTransactionByRef('1234567890'),
-  //         DoesNotExistError,
-  //         ERROR_MESSAGE_TRANSACTION_NOT_FOUND,
-  //     )
-  //   })
-  // })
+  describe('deleteCustomer', () => {
+    it('should delete customer as expected', async () => {
+      // given ... 3 customers exist
+      const customers = await Factories.Customer.create(3)
+      const existingCustomerIds = R.pluck(CUSTOMER_PRIMARY_KEY)(customers)
+
+      // when ... we delete the 2nd customer
+      const customer2Id = R.nth(1, existingCustomerIds)
+      const result = await SUT.deleteCustomer(customer2Id)
+
+      // then
+      // ... should delete the 2nd customer and return null
+      assert.equal(result, null)
+      const customersResult = await SUT.getCustomers({})({})
+      assert.equal(customersResult.count, 2)
+      const customerIds = R.pluck(CUSTOMER_PRIMARY_KEY)(customersResult.rows)
+      const customer1Id = R.nth(0, existingCustomerIds)
+      const customer3Id = R.nth(2, existingCustomerIds)
+      assert.includeMembers(customerIds, [customer1Id, customer3Id])
+      assert.notIncludeMembers(customerIds, [customer2Id])
+    })
+  })
 })

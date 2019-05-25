@@ -1,3 +1,5 @@
+plugins:
+  - 'mocha-no-only'
 env:
   node: true
   mocha: true
@@ -23,4 +25,10 @@ rules:
     - error
     - always-multiline
   operator-linebreak:
+    - off
+  mocha-no-only/mocha-no-only:
+    - error
+  function-paren-newline:
+    - off
+  object-curly-newline:
     - off

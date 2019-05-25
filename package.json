@@ -58,7 +58,7 @@
     "db:migrate:rollback:staging": "npm-run-all _env:create:staging _db:migrate:rollback:staging",
     "db:migrate:reset": "npm-run-all _env:create:local _db:migrate:reset:local",
     "db:migrate:reset:staging": "npm-run-all _env:create:staging _db:migrate:reset:staging",
-    "_git:pre-commit": "npm-run-all lint:js _test:all:dot ci:validate",
+    "_git:pre-commit": "npm-run-all lint:js _test:dot ci:validate",
     "_git:pre-push": "npm-run-all lint:js test:unit:cov test:cov ci:validate _env:tpl:validate"
   },
   "husky": {
@@ -81,9 +81,10 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "dotenv": "^6.1.0",
-    "eslint": "^5.8.0",
+    "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-mocha-no-only": "^1.1.0",
     "husky": "^1.1.3",
     "js-parametrize": "0.0.2",
     "mocha": "^5.2.0",

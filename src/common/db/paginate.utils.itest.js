@@ -30,7 +30,8 @@ describe('common/db/paginate.utils', () => {
           await Factories.Country.create(rowCount)
 
           // when ... we paginate with the provided config
-          const result = await SUT.paginate(models.Country, 'country_id', config)
+          const baseParams = {}
+          const result = await SUT.paginate(models.Country, 'country_id', baseParams, config)
 
           // then ... should return expected count
           assert.equal(result.count, rowCount)
@@ -54,7 +55,8 @@ describe('common/db/paginate.utils', () => {
           ))
 
           // when ... we paginate with the provided config
-          const result = await SUT.paginate(models.Country, 'country_id', config)
+          const baseParams = {}
+          const result = await SUT.paginate(models.Country, 'country_id', baseParams, config)
 
           // then ... should return expected count
           assert.equal(result.count, expectedRowCount)
@@ -77,7 +79,8 @@ describe('common/db/paginate.utils', () => {
           await Factories.Country.create(rowCount)
 
           // when ... we paginate with the provided config
-          const result = await SUT.paginate(models.Country, 'country_id', config)
+          const baseParams = {}
+          const result = await SUT.paginate(models.Country, 'country_id', baseParams, config)
 
           // then ... should return expected records
           const recordIds = R.pluck('country_id', result.rows)
@@ -105,8 +108,9 @@ describe('common/db/paginate.utils', () => {
           )
 
           // when ... we paginate with the provided config
+          const baseParams = {}
           const _config = R.mergeRight(config, { pageSize: records.length, pageNumber: 1 })
-          const result = await SUT.paginate(models.Country, 'country_id', _config)
+          const result = await SUT.paginate(models.Country, 'country_id', baseParams, _config)
 
           // then ... should return expected records
           const recordIds = R.pluck('country_id', result.rows)
@@ -131,7 +135,8 @@ describe('common/db/paginate.utils', () => {
           )
 
           // when ... we paginate with the provided config
-          const result = await SUT.paginate(models.Country, 'country_id', config)
+          const baseParams = {}
+          const result = await SUT.paginate(models.Country, 'country_id', baseParams, config)
 
           // then ... should return expected records
           const recordIds = R.pluck('country_id', result.rows)
@@ -164,8 +169,9 @@ describe('common/db/paginate.utils', () => {
           ))
 
           // when ... we paginate with the provided config
+          const baseParams = {}
           const _config = R.mergeRight(config, { pageSize: records.length, pageNumber: 1 })
-          const result = await SUT.paginate(models.Address, 'address_id', _config)
+          const result = await SUT.paginate(models.Address, 'address_id', baseParams, _config)
 
           // then ... should return expected records
           const recordIds = R.pluck('address_id', result.rows)
@@ -198,7 +204,8 @@ describe('common/db/paginate.utils', () => {
           ))
 
           // when ... we paginate with the provided config
-          const result = await SUT.paginate(models.Address, 'address_id', config)
+          const baseParams = {}
+          const result = await SUT.paginate(models.Address, 'address_id', baseParams, config)
 
           // then ... should return expected records
           const recordIds = R.pluck('address_id', result.rows)
@@ -222,8 +229,9 @@ describe('common/db/paginate.utils', () => {
         )
 
         // when ... we paginate with the provided config
+        const baseParams = {}
         const _config = R.mergeRight(config, { pageSize: records.length, pageNumber: 1 })
-        const result = await SUT.paginate(models.Country, 'country_id', _config)
+        const result = await SUT.paginate(models.Country, 'country_id', baseParams, _config)
 
         // then ... should return expected records
         const recordIds = R.pluck('country_id', result.rows)
@@ -257,8 +265,9 @@ describe('common/db/paginate.utils', () => {
         )
 
         // when ... we paginate with the provided config
+        const baseParams = {}
         const _config = R.mergeRight(config, { pageSize: records.length, pageNumber: 1 })
-        const result = await SUT.paginate(models.Address, 'address_id', _config)
+        const result = await SUT.paginate(models.Address, 'address_id', baseParams, _config)
 
         // then ... should return expected records
         const recordIds = R.pluck('address_id', result.rows)

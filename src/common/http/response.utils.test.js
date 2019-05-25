@@ -11,12 +11,13 @@ const {
   INT,
 } = queryParamTypes
 
-describe('response.utils', () => {
+describe('common/http/response.utils', () => {
   describe('transformResponse', () => {
     parametrize([
-      [{ a: 'A' }, { a: 'b' }, { b: 'A' }],
-      [{ a: 'A', c: 'C' }, { a: 'b' }, { b: 'A' }],
-      [{ a: 'A', c: 'C' }, { a: 'b', c: 'c' }, { b: 'A', c: 'C' }],
+      [{ a: 'A' }, { a: 'aa' }, { aa: 'A' }],
+      [{ a: 'A', c: 'C' }, { a: 'bbb' }, { bbb: 'A' }],
+      [{ a: 'A', c: 'C' }, { a: 'bB', c: 'cC' }, { bB: 'A', cC: 'C' }],
+      [{ a: 'A' }, { a: 'bB', c: 'cC' }, { bB: 'A', cC: null }],
     ], (source, fieldMap, expected) => {
       it('should transform provided object keys as expected using map object', () => {
         assert.deepEqual(SUT.transformResponse(fieldMap)(source), expected)

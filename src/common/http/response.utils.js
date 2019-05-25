@@ -18,11 +18,11 @@ module.exports.pathToUrlQueryParam = pathToUrlQueryParam
 // transform response
 //-----------------------------------------
 
-const transformResponse = fieldMap => R.pipe(
-  x => R.reduce((acc, [k1, k2]) => (
-    R.mergeRight(acc, { [k2]: R.prop(k1, x) })
-  ), {}, R.toPairs(fieldMap)),
-)
+const transformResponse = keyMap => data => R.pipe(
+  R.toPairs,
+  R.map(([x, y]) => [y, R.propOr(null, x, data)]),
+  R.fromPairs,
+)(keyMap)
 
 module.exports.transformResponse = transformResponse
 
