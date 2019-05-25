@@ -4,7 +4,7 @@ const R = require('ramda')
 // convert path to query param
 //-----------------------------------------
 
-const pathToUrlQueryParam = (path) => (
+const pathToUrlQueryParam = path => (
   R.pipe(
     R.tail,
     R.map(x => `[${x}]`),
@@ -41,7 +41,7 @@ const rebuildExtraQueryParams = queryParams => R.pipe(
       R.ifElse(
         R.is(Object),
         R.compose(R.toPairs, R.pick(R.prop('keys', x))),
-        x => [[x]],
+        y => [[y]],
       ),
       R.map(R.concat(path)),
       R.concat(acc),
@@ -88,7 +88,14 @@ const buildPaginationResponsePaginationLinks = (count, pageNumber, pageSize) => 
   }
 }
 
-const buildPaginationResponse = (endpoint, baseParams, queryParams, queryParamsConfig, rows, count) => {
+const buildPaginationResponse = (
+  endpoint,
+  baseParams,
+  queryParams,
+  queryParamsConfig,
+  rows,
+  count,
+) => {
   const params = R.mergeDeepRight(baseParams, queryParams)
   const { pageNumber, pageSize } = params
   const _queryParams = R.dissocPath(['page', 'number'])(queryParams)

@@ -28,7 +28,6 @@ describe('common/http/request.utils', () => {
   })
 
   describe('extractQueryParams', () => {
-
     // <path>[<SORT_KEYS>]=<SORT_VALUES>
     // eg.
     // if key is 'sorting'
@@ -125,7 +124,6 @@ describe('common/http/request.utils', () => {
     })
 
     describe('enum-keys', () => {
-
       // <path>[<FILTER_KEYS>]=<any value>
       // eg.
       // if key is 'filtering'
@@ -213,7 +211,6 @@ describe('common/http/request.utils', () => {
     })
 
     describe('int', () => {
-
       // <path>=<INTEGER>
       // eg.
       // if key is 'pageNumber'
@@ -246,7 +243,6 @@ describe('common/http/request.utils', () => {
             { key: 'key2', path, type: INT },
           ]
           assert.deepEqual(SUT.extractQueryParams(configs)(data), {})
-          // assert.deepEqual(SUT.extractQueryParams(configs)(data), { key1: null, key2: null })
         })
       })
     })

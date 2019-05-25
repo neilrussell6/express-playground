@@ -2,8 +2,8 @@ const { DataTypes } = require('sequelize')
 const Bluebird = require('bluebird')
 
 module.exports = {
-  up: (queryInterface, sequelize) => (
-    Bluebird.resolve(
+  up: (queryInterface, sequelize) => Bluebird
+    .resolve(
       queryInterface.createTable('customer', {
         customer_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
         store_id: { type: DataTypes.SMALLINT, allowNull: false },
@@ -72,7 +72,7 @@ module.exports = {
     .then(() => queryInterface.createTable('city', {
       city_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
       city: { type: DataTypes.STRING, allowNull: false },
-      country_id: { type: DataTypes.SMALLINT, allowNull: false },
+      country_id: { type: DataTypes.SMALLINT, allowNull: false },
       create_date: { type: DataTypes.DATE, allowNull: false, defaultValue: sequelize.fn('NOW') },
       last_update: { type: DataTypes.DATE, allowNull: false, defaultValue: sequelize.fn('NOW') },
     }))
@@ -135,25 +135,23 @@ module.exports = {
       address_id: { type: DataTypes.SMALLINT, allowNull: false },
       last_update: { type: DataTypes.DATE, allowNull: false, defaultValue: sequelize.fn('NOW') },
     }))
-    .catch(e => console.log(e))
-  ),
-  down: queryInterface => (
-    Bluebird
-      .resolve(queryInterface.dropTable('customer'))
-      .then(() => queryInterface.dropTable('actor'))
-      .then(() => queryInterface.dropTable('category'))
-      .then(() => queryInterface.dropTable('film'))
-      .then(() => queryInterface.dropTable('film_actor'))
-      .then(() => queryInterface.dropTable('film_category'))
-      .then(() => queryInterface.dropTable('address'))
-      .then(() => queryInterface.dropTable('city'))
-      .then(() => queryInterface.dropTable('country'))
-      .then(() => queryInterface.dropTable('inventory'))
-      .then(() => queryInterface.dropTable('language'))
-      .then(() => queryInterface.dropTable('payment'))
-      .then(() => queryInterface.dropTable('rental'))
-      .then(() => queryInterface.dropTable('staff'))
-      .then(() => queryInterface.dropTable('store'))
-      .catch(e => console.log(e))
-  ),
+    .catch(e => console.log(e)), // eslint-disable-line no-console
+
+  down: queryInterface => Bluebird
+    .resolve(queryInterface.dropTable('customer'))
+    .then(() => queryInterface.dropTable('actor'))
+    .then(() => queryInterface.dropTable('category'))
+    .then(() => queryInterface.dropTable('film'))
+    .then(() => queryInterface.dropTable('film_actor'))
+    .then(() => queryInterface.dropTable('film_category'))
+    .then(() => queryInterface.dropTable('address'))
+    .then(() => queryInterface.dropTable('city'))
+    .then(() => queryInterface.dropTable('country'))
+    .then(() => queryInterface.dropTable('inventory'))
+    .then(() => queryInterface.dropTable('language'))
+    .then(() => queryInterface.dropTable('payment'))
+    .then(() => queryInterface.dropTable('rental'))
+    .then(() => queryInterface.dropTable('staff'))
+    .then(() => queryInterface.dropTable('store'))
+    .catch(e => console.log(e)), // eslint-disable-line no-console
 }

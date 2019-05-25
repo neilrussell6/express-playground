@@ -32,3 +32,21 @@ rules:
     - off
   object-curly-newline:
     - off
+overrides:
+  - files:
+      - src/**/*.test.js
+      - src/**/*.itest.js
+      - src/**/*.etest.js
+    rules:
+      import/no-extraneous-dependencies:
+        - off
+      max-len:
+        - off
+      camelcase:
+        - off
+  - files:
+      - db/migrations/**/*.js
+      - db/models/**/*.js
+    rules:
+      max-len:
+        - off

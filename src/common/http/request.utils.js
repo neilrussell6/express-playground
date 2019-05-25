@@ -16,7 +16,7 @@ module.exports.queryParamTypes = queryParamTypes
 // convert path to query param
 //-----------------------------------------
 
-const pathToUrlQueryParam = (path) => (
+const pathToUrlQueryParam = path => (
   R.pipe(
     R.tail,
     R.map(x => `[${x}]`),
@@ -129,6 +129,3 @@ const transformRequestBody = fieldMap => R.pipe(
 )
 
 module.exports.transformRequestBody = transformRequestBody
-
-
-

@@ -58,8 +58,8 @@
     "db:migrate:rollback:staging": "npm-run-all _env:create:staging _db:migrate:rollback:staging",
     "db:migrate:reset": "npm-run-all _env:create:local _db:migrate:reset:local",
     "db:migrate:reset:staging": "npm-run-all _env:create:staging _db:migrate:reset:staging",
-    "_git:pre-commit": "npm-run-all lint:js _test:dot ci:validate",
-    "_git:pre-push": "npm-run-all lint:js test:unit:cov test:cov ci:validate _env:tpl:validate"
+    "_git:pre-commit": "npm-run-all lint:js _test:dot",
+    "_git:pre-push": "npm-run-all lint:js _test:dot _test:integration:dot _env:tpl:validate"
   },
   "husky": {
     "hooks": {

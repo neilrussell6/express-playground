@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     freezeTableName: true,
     tableName: 'country',
   })
-  Country.associate = function(models) {
+  Country.associate = () => {
     // associations can be defined here
   }
   return Country

@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     freezeTableName: true,
     tableName: 'film',
   })
-  Inventory.associate = function(models) {
+  Inventory.associate = () => {
     // associations can be defined here
   }
   return Inventory

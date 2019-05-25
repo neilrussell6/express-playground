@@ -14,11 +14,11 @@ const dbConfig = {
 module.exports = {
   development: {
     ...dbConfig,
-    logging: (query) => console.log(query), // eslint-disable-line no-console
+    logging: query => console.log(query), // eslint-disable-line no-console
   },
   staging: {
     ...dbConfig,
-    logging: (query) => console.log(query), // eslint-disable-line no-console
+    logging: query => console.log(query), // eslint-disable-line no-console
   },
   production: {
     ...dbConfig,

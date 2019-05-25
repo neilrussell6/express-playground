@@ -1,6 +1,5 @@
 const Factory = require('../../../common/factory')
 const models = require('../../../../db/models/index')
-const R = require('ramda')
 
 const Country = Factory(models.Country, {
   country: 'COUNTRY NAME',

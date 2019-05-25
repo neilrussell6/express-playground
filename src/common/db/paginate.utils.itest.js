@@ -66,12 +66,12 @@ describe('common/db/paginate.utils', () => {
 
     describe('pageSize/pageNumber', () => {
       parametrize([
-        [5, { pageSize: 2, pageNumber: 1 }, [1,2]],
-        [3, { pageSize: 2, pageNumber: 1 }, [1,2]],
-        [2, { pageSize: 2, pageNumber: 1 }, [1,2]],
+        [5, { pageSize: 2, pageNumber: 1 }, [1, 2]],
+        [3, { pageSize: 2, pageNumber: 1 }, [1, 2]],
+        [2, { pageSize: 2, pageNumber: 1 }, [1, 2]],
         [1, { pageSize: 2, pageNumber: 1 }, [1]],
-        [5, { pageSize: 3, pageNumber: 1 }, [1,2,3]],
-        [5, { pageSize: 2, pageNumber: 2 }, [3,4]],
+        [5, { pageSize: 3, pageNumber: 1 }, [1, 2, 3]],
+        [5, { pageSize: 2, pageNumber: 2 }, [3, 4]],
         [5, { pageSize: 2, pageNumber: 3 }, [5]],
       ], (rowCount, config, expectedRecordIds) => {
         it('should return expected records', async () => {

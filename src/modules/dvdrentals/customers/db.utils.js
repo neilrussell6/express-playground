@@ -34,7 +34,7 @@ module.exports.getCustomer = getCustomer
 //-----------------------------------------
 
 const createCustomer = data => Bluebird
-    .resolve(models.Customer.create(data))
+  .resolve(models.Customer.create(data))
 
 module.exports.createCustomer = createCustomer
 
@@ -44,12 +44,12 @@ module.exports.createCustomer = createCustomer
 
 const updateCustomer = (pk, data) => Bluebird
   .resolve(pk)
-  .then((x) => models.Customer.update(data, {
+  .then(x => models.Customer.update(data, {
     where: {
       [CUSTOMER_PRIMARY_KEY]: x,
     },
   }))
-  .then(() => models.Customer.find({
+  .then(() => models.Customer.findOne({
     where: {
       [CUSTOMER_PRIMARY_KEY]: pk,
     },
@@ -64,7 +64,7 @@ module.exports.updateCustomer = updateCustomer
 
 const deleteCustomer = pk => Bluebird
   .resolve(pk)
-  .then((x) => models.Customer.destroy({
+  .then(x => models.Customer.destroy({
     where: {
       [CUSTOMER_PRIMARY_KEY]: x,
     },

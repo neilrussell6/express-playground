@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     freezeTableName: true,
     tableName: 'category',
   })
-  Category.associate = function(models) {
+  Category.associate = () => {
     // associations can be defined here
     // TODO: film_category
   }

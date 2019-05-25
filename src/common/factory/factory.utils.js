@@ -37,8 +37,8 @@ const modelCreate = model => R.ifElse(
   x => Bluebird
     .resolve(x)
     .then(R.head)
-    .then(x => model.create(x))
-    .then(x => [x]),
+    .then(y => model.create(y))
+    .then(y => [y]),
 )
 
 const factoryCreateAssociated = R.ifElse(
@@ -87,7 +87,7 @@ const build = ({ base }) => R.pipe(
 
 const Factory = (model, base) => ({
   create: (...xs) => create({ model, base })(xs),
-  build: (...xs) => build({ base })(xs),
+  build: (...xs) => build({ base })(xs),
 })
 
 module.exports.Factory = Factory

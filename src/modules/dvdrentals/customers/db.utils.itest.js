@@ -52,8 +52,7 @@ describe('dvdrentals/customers/db.utils', () => {
     it('should create customer as expected', async () => {
       // given ... a store with address exists
       const store = await Factories.Store.create()
-      const store_id = store.store_id
-      const address_id = store.address_id
+      const { store_id, address_id } = store
 
       // when ... we create a customer
       const customer = await Factories.Customer.build()

@@ -10,7 +10,7 @@ chai.use(chaiAsPromised)
 
 const { assert } = chai
 
-describe('commmon/factory/factory.utils', () => {
+describe('common/factory/factory.utils', () => {
   let sandbox = null
 
   beforeEach(async () => {
@@ -24,7 +24,7 @@ describe('commmon/factory/factory.utils', () => {
   describe('Factory', () => {
     describe('create', () => {
       parametrize([
-        [{ a: 'A' }, { a: 'A'}],
+        [{ a: 'A' }, { a: 'A' }],
       ], (defaultData, expectedCall) => {
         it('should create a single new record with default data', async () => {
           // given ... the provided model will behave as expected
@@ -133,7 +133,7 @@ describe('commmon/factory/factory.utils', () => {
 
     describe('build', () => {
       parametrize([
-        [{ a: 'A' }, { a: 'A'}],
+        [{ a: 'A' }, { a: 'A' }],
       ], (defaultData, expected) => {
         it('should build a single record with default data', async () => {
           // given ... the provided model will behave as expected

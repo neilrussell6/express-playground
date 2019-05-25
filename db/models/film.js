@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     freezeTableName: true,
     tableName: 'film',
   })
-  Film.associate = function(models) {
+  Film.associate = () => {
     // associations can be defined here
     // TODO: film_actor
     // TODO: film_category

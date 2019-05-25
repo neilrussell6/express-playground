@@ -3,7 +3,6 @@ const parametrize = require('js-parametrize')
 
 const SUT = require('./response.utils')
 const { queryParamTypes } = require('../../common/http/request.utils')
-const { BASE_PARAMS } = require('../../modules/dvdrentals/customers/constants')
 
 const {
   ENUM_KEYS_VALUES,
@@ -99,7 +98,7 @@ describe('common/http/response.utils', () => {
       const baseParams = {
         pageNumber: 3,
         pageSize: 10,
-        sorting: { id: 'ASC'},
+        sorting: { id: 'ASC' },
       }
       const queryParams = {}
       const queryParamsConfig = [
@@ -120,7 +119,7 @@ describe('common/http/response.utils', () => {
           self: 'api?page[number]=3',
           prev: 'api?page[number]=2',
           next: 'api?page[number]=4',
-          first:'api?page[number]=1',
+          first: 'api?page[number]=1',
           last: 'api?page[number]=5',
         },
         data: rows,
@@ -132,7 +131,7 @@ describe('common/http/response.utils', () => {
       const baseParams = {
         pageNumber: 3,
         pageSize: 10,
-        sorting: { id: 'ASC'},
+        sorting: { id: 'ASC' },
       }
       const queryParams = {
         page: { size: '15', number: '3' },
