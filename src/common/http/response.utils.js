@@ -20,7 +20,7 @@ module.exports.pathToUrlQueryParam = pathToUrlQueryParam
 
 const transformResponse = keyMap => data => R.pipe(
   R.toPairs,
-  R.map(([x, y]) => [y, R.propOr(null, x, data)]),
+  R.map(([x, y]) => [x, R.propOr(null, y, data)]),
   R.fromPairs,
 )(keyMap)
 

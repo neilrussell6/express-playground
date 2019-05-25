@@ -96,7 +96,7 @@ describe('dvdrentals/customers/handlers', () => {
         self: 'http://localhost:3001/customers?page[number]=1',
       })
       assert.equal(result.data.length, 5)
-      assert.hasAllKeys(result.data[0], R.values(CUSTOMER_KEY_MAP))
+      assert.hasAllKeys(result.data[0], R.keys(CUSTOMER_KEY_MAP))
       // ... after correctly retrieving records
       sinon.assert.calledWithExactly(getCustomersStub, {
         pageNumber: 1,

@@ -13,10 +13,10 @@ const {
 describe('common/http/response.utils', () => {
   describe('transformResponse', () => {
     parametrize([
-      [{ a: 'A' }, { a: 'aa' }, { aa: 'A' }],
-      [{ a: 'A', c: 'C' }, { a: 'bbb' }, { bbb: 'A' }],
-      [{ a: 'A', c: 'C' }, { a: 'bB', c: 'cC' }, { bB: 'A', cC: 'C' }],
-      [{ a: 'A' }, { a: 'bB', c: 'cC' }, { bB: 'A', cC: null }],
+      [{ a: 'A' }, { aa: 'a' }, { aa: 'A' }],
+      [{ a: 'A', c: 'C' }, { bbb: 'a' }, { bbb: 'A' }],
+      [{ a: 'A', c: 'C' }, { bB: 'a', cC: 'c' }, { bB: 'A', cC: 'C' }],
+      [{ a: 'A' }, { bB: 'a', cC: 'c' }, { bB: 'A', cC: null }],
     ], (source, fieldMap, expected) => {
       it('should transform provided object keys as expected using map object', () => {
         assert.deepEqual(SUT.transformResponse(fieldMap)(source), expected)
