@@ -12,9 +12,9 @@ const { assert } = chai
 const Factories = require('./factories')
 
 describe('dvdrentals/customers/db.utils', () => {
-  beforeEach(async () => {
-    await models.sequelize.sync({ force: true, match: /_test$/ })
-  })
+  beforeEach(() => (
+    models.sequelize.sync({ force: true, match: /_test$/ })
+  ))
 
   describe('getCustomers', () => {
     it('should return all customers as expected', async () => {

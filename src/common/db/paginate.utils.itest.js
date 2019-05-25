@@ -14,9 +14,9 @@ const { assert } = chai
 
 // TODO: replace all dvdrentals with models/factories created in this test
 describe('common/db/paginate.utils', () => {
-  beforeEach(async () => {
-    await models.sequelize.sync({ force: true, match: /_test$/ })
-  })
+  beforeEach(() => (
+    models.sequelize.sync({ force: true, match: /_test$/ })
+  ))
 
   describe('paginate', () => {
     describe('count', () => {
