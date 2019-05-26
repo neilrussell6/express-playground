@@ -5,7 +5,17 @@ const {
   ENUM_KEYS,
   INT,
 } = queryParamTypes
+
+// ----------------------------------------------
+// db
+// ----------------------------------------------
+
 const CUSTOMER_PRIMARY_KEY = 'customer_id'
+
+// ----------------------------------------------
+// keys
+// ----------------------------------------------
+
 const CUSTOMER_KEY_MAP = {
   id: 'customer_id',
   address: 'address_id',
@@ -19,6 +29,10 @@ const CUSTOMER_KEY_MAP = {
 const CUSTOMER_FILTER_KEYS = ['active', 'email', 'firstName', 'lastName', 'created']
 const CUSTOMER_SORT_KEYS = ['active', 'email', 'firstName', 'lastName', 'created']
 const CUSTOMER_SORT_VALUES = ['ASC', 'DESC']
+
+// ----------------------------------------------
+// query params
+// ----------------------------------------------
 
 /* eslint-disable max-len */
 const CUSTOMER_QUERY_PARAM_CONFIG = [
@@ -43,7 +57,19 @@ const CUSTOMER_BASE_PARAMS = {
   sorting: { [CUSTOMER_PRIMARY_KEY]: 'ASC' },
 }
 
+// ----------------------------------------------
+// endpoints
+// ----------------------------------------------
+
 const API_ENDPOINT_CUSTOMERS = `${process.env.API_URL}/customers`
+
+// ----------------------------------------------
+// error messages
+// ----------------------------------------------
+
+const ERROR_MESSAGE_DB_RESOURCE_DOES_NOT_EXIST = 'Requested customer does not exist'
+
+// ----------------------------------------------
 
 module.exports = {
   CUSTOMER_PRIMARY_KEY,
@@ -54,4 +80,5 @@ module.exports = {
   CUSTOMER_QUERY_PARAM_CONFIG,
   CUSTOMER_BASE_PARAMS,
   API_ENDPOINT_CUSTOMERS,
+  ERROR_MESSAGE_DB_RESOURCE_DOES_NOT_EXIST,
 }

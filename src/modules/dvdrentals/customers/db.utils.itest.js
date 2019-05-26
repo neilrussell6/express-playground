@@ -5,6 +5,8 @@ const R = require('ramda')
 const models = require('../../../../db/models/index')
 const SUT = require('./db.utils')
 const { CUSTOMER_PRIMARY_KEY } = require('./constants')
+const { DoesNotExistError } = require('../../../common/db/db.errors')
+const { ERROR_MESSAGE_DB_RESOURCE_DOES_NOT_EXIST } = require('./constants')
 
 chai.use(chaiAsPromised)
 
@@ -46,6 +48,19 @@ describe('dvdrentals/customers/db.utils', () => {
       // then ... should return requested customer
       assert.equal(R.prop(CUSTOMER_PRIMARY_KEY, result), customer2Id)
     })
+
+    it('should fail with does not exist error', async () => {
+      // given ... a customer exists
+      await Factories.Customer.create(1)
+
+      // when ... we attempt to get a customer that does not exist
+      // then ... should fail with does not exist error
+      await assert.isRejected(
+        SUT.getCustomer(123),
+        DoesNotExistError,
+        ERROR_MESSAGE_DB_RESOURCE_DOES_NOT_EXIST,
+      )
+    })
   })
 
   describe('createCustomer', () => {
@@ -55,11 +70,14 @@ describe('dvdrentals/customers/db.utils', () => {
       const { store_id, address_id } = store
 
       // when ... we create a customer
-      const customer = await Factories.Customer.build()
+      const customer = await Factories.Customer.build({
+        first_name: 'NEW CUSTOMER',
+      })
       const result = await SUT.createCustomer({ ...customer, store_id, address_id })
 
       // then ... should succeed and return new customer
       assert.equal(result.customer_id, 1)
+      assert.equal(result.first_name, 'NEW CUSTOMER')
     })
   })
 
@@ -74,7 +92,7 @@ describe('dvdrentals/customers/db.utils', () => {
 
       // when ... we update the 2nd customer
       const customer2Id = R.nth(1, existingCustomerIds)
-      const result = await SUT.updateCustomer(customer2Id, {
+      const result = await SUT.updateCustomer(customer2Id)({
         first_name: 'NEW NAME',
         activebool: false,
       })
@@ -89,6 +107,19 @@ describe('dvdrentals/customers/db.utils', () => {
       assert.equal(customer1.first_name, 'OLD NAME')
       assert.equal(customer2.first_name, 'NEW NAME')
       assert.equal(customer3.first_name, 'OLD NAME')
+    })
+
+    it('should fail with does not exist error', async () => {
+      // given ... a customer exists
+      await Factories.Customer.create(1)
+
+      // when ... we attempt to update a customer that does not exist
+      // then ... should fail with does not exist error
+      await assert.isRejected(
+        SUT.updateCustomer(123)({ first_name: 'NEW NAME' }),
+        DoesNotExistError,
+        ERROR_MESSAGE_DB_RESOURCE_DOES_NOT_EXIST,
+      )
     })
   })
 
@@ -112,6 +143,19 @@ describe('dvdrentals/customers/db.utils', () => {
       const customer3Id = R.nth(2, existingCustomerIds)
       assert.includeMembers(customerIds, [customer1Id, customer3Id])
       assert.notIncludeMembers(customerIds, [customer2Id])
+    })
+
+    it('should fail with does not exist error', async () => {
+      // given ... a customer exists
+      await Factories.Customer.create(1)
+
+      // when ... we attempt to delete a customer that does not exist
+      // then ... should fail with does not exist error
+      await assert.isRejected(
+        SUT.deleteCustomer(123),
+        DoesNotExistError,
+        ERROR_MESSAGE_DB_RESOURCE_DOES_NOT_EXIST,
+      )
     })
   })
 })

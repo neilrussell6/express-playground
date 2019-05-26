@@ -8,7 +8,6 @@ const {
   API_ENDPOINT_CUSTOMERS,
   CUSTOMER_QUERY_PARAM_CONFIG,
   CUSTOMER_KEY_MAP,
-  CUSTOMER_PRIMARY_KEY,
   CUSTOMER_BASE_PARAMS,
 } = require('./constants')
 
@@ -42,17 +41,28 @@ const getCustomers = queryParams => Bluebird
 module.exports.getCustomers = getCustomers
 
 //-----------------------------------------
+// get customer
+//-----------------------------------------
+
+const getCustomer = pk => Bluebird
+  .resolve(pk)
+  .then(DbUtils.getCustomer)
+  .then(ResponseUtils.transformResponse(CUSTOMER_KEY_MAP))
+  .then(R.objOf('data'))
+
+module.exports.getCustomer = getCustomer
+
+//-----------------------------------------
 // create customer
 //-----------------------------------------
 
 const createCustomer = data => Bluebird
   .resolve(data)
-  .then(R.mergeRight({ store: 1, address: 1 }))
-  .then(RequestUtils.transformRequestBody(R.invertObj(CUSTOMER_KEY_MAP)))
-  .then(x => DbUtils
-    .createCustomer(x)
-    .then(ResponseUtils.transformResponse(CUSTOMER_KEY_MAP))
-  )
+  // TODO: move this to DbUtils (it's specifically transforming for DB compatibility
+  .then(RequestUtils.transformRequestBody(CUSTOMER_KEY_MAP))
+  .then(DbUtils.createCustomer)
+  .then(ResponseUtils.transformResponse(CUSTOMER_KEY_MAP))
+  .then(R.objOf('data'))
 
 module.exports.createCustomer = createCustomer
 
@@ -60,16 +70,21 @@ module.exports.createCustomer = createCustomer
 // update customer
 //-----------------------------------------
 
-const updateCustomer = (id, data) => Bluebird
-  .resolve(R.mergeRight({ id }, data))
+const updateCustomer = (pk, data) => Bluebird
+  .resolve(data)
   .then(RequestUtils.transformRequestBody(CUSTOMER_KEY_MAP))
-  .then(x => DbUtils
-    .updateCustomer(
-      CUSTOMER_PRIMARY_KEY,
-      parseInt(R.prop(CUSTOMER_PRIMARY_KEY, x), 10),
-      R.omit(CUSTOMER_PRIMARY_KEY, x),
-    )
-    .then(ResponseUtils.transformResponse(CUSTOMER_KEY_MAP))
-  )
+  .then(DbUtils.updateCustomer(pk))
+  .then(ResponseUtils.transformResponse(CUSTOMER_KEY_MAP))
+  .then(R.objOf('data'))
 
 module.exports.updateCustomer = updateCustomer
+
+//-----------------------------------------
+// delete customer
+//-----------------------------------------
+
+const deleteCustomer = pk => Bluebird
+  .resolve(pk)
+  .then(DbUtils.deleteCustomer)
+
+module.exports.deleteCustomer = deleteCustomer

@@ -65,7 +65,7 @@ describe('dvdrentals/customers/handlers', () => {
       })
     })
 
-    it('should returns requested customers as expected', async () => {
+    it('should return requested customers as expected', async () => {
       // given ... getting customers from DB will succeed
       const customers = Factories.Customer.build(5)
       const getCustomersStub = sandbox
@@ -81,6 +81,7 @@ describe('dvdrentals/customers/handlers', () => {
 
       // then
       // ... should succeed returning expected response
+      assert.hasAllKeys(result, ['meta', 'links', 'data'])
       assert.deepEqual(result.meta, {
         currentPage: 1,
         firstRow: 1,
@@ -105,6 +106,25 @@ describe('dvdrentals/customers/handlers', () => {
           customer_id: 'ASC',
         },
       })
+    })
+  })
+
+  describe('getCustomer', () => {
+    it('should return requested customer as expected', async () => {
+      // given ... getting customer from DB will succeed
+      const customer = Factories.Customer.build(1)
+      const getCustomerStub = sandbox
+        .stub(DbUtils, 'getCustomer')
+        .resolves(customer)
+
+      // when ... we get a specific customer
+      const result = await SUT.getCustomer(123)
+
+      // then
+      // ... should succeed returning expected response
+      assert.hasAllKeys(result.data, R.keys(CUSTOMER_KEY_MAP))
+      // ... after correctly retrieving records
+      sinon.assert.calledWithExactly(getCustomerStub, 123)
     })
   })
 })
