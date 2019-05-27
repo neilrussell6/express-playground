@@ -1,7 +1,7 @@
-Serverless playground
+Express playground
 ===
 
-> A minimal Serverless project for experimenting and refining templates / deployment pipelines
+> A minimal Express project for experimenting and refining templates / deployment pipelines
 
 Master branch
 ---
@@ -38,7 +38,7 @@ then update your local ``.env`` as needed (eg. set ``AWS_PROFILE`` to the profil
  4. ``npm run db:start`` start db
  5. ``npm run db:migrate`` run db migrations
  6. ``make psql F=".backups/data/seed.sql"`` seed ``dvdrentals`` database with sample data (optional)
- 7. ``npm run start`` start Serverless
+ 7. ``npm run start`` start Express
 
 Testing
 ---
