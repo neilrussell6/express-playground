@@ -75,7 +75,7 @@
     "express": "^4.16.4",
     "pg": "^7.10.0",
     "ramda": "^0.26.0",
-    "sequelize": "^5.4.0",
+    "sequelize": "^5.15.1",
     "sequelize-cli": "^5.4.0"
   },
   "devDependencies": {
